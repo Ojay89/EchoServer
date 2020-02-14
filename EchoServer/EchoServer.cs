@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 
 namespace EchoServer
 {
@@ -9,18 +10,29 @@ namespace EchoServer
     {
         static void Main(string[] args)
         {
-            //Opret listener og starte
+            //Opret server
             IPAddress ip = IPAddress.Parse("192.168.24.241");
+            //Opret adresse eller port
             TcpListener serverSocket = new TcpListener(ip, 7777);
-
+            //starter server
             serverSocket.Start();
             Console.WriteLine("Server Started");
 
-            //Venter på connection før den aktiverer
-            TcpClient connectionSocket = serverSocket.AcceptTcpClient();
-            Console.WriteLine("Server activated & Connected");
+            //loop åbner for mulighed for at connecte flere clients
+            do
+            {
+                Task.Run(() =>
+                {
+                    //Venter på connection før den aktiverer
+                    TcpClient connectionSocket = serverSocket.AcceptTcpClient();
+                    Console.WriteLine("Server activated & Connected");
+                    //kalder metoden DoClient
+                    DoClient(connectionSocket);
 
-            DoClient(connectionSocket);
+                   });
+
+            } while (true);
+
             serverSocket.Stop();
             Console.WriteLine("Server stopped & Disconnected");
         }
