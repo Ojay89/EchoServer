@@ -57,6 +57,7 @@ namespace EchoServer
 
             ns.Close();
             socket.Close();
+
         }
     }
 }
